@@ -22,12 +22,10 @@ def normalize(s: str) -> str:
     s = re.sub(r"\bln\s*\(", "log(", s)
     return _deg.sub(r"\1(pi*(\2)/180)", s)
 
-def parse(expr: str, ans=None):
+def parse(expr: str):
     expr = normalize(expr)
 
     loc = dict(SAFE)
-    if ans is not None:
-        loc["Ans"] = ans
 
     for name in set(re.findall(r"[A-Za-z_]\w*", expr)) - set(loc):
         loc[name] = Symbol(name)
@@ -41,7 +39,6 @@ class MiniCalc(tk.Tk):
         self.title("Аналитический калькулятор")
         self.geometry("720x420")
 
-        self.ans = None
         self.expr = tk.StringVar()
         self.result = tk.StringVar()
 
@@ -50,7 +47,6 @@ class MiniCalc(tk.Tk):
         btns = ttk.Frame(self)
         btns.pack(padx=10)
 
-        #режимы работы
         self.ops = {
             "=": ("eval", None),
             "d/dx": ("diff", None),
@@ -82,7 +78,7 @@ class MiniCalc(tk.Tk):
             self.set_steps("")
             return
 
-        expr = parse(self.expr.get(), self.ans)
+        expr = parse(self.expr.get())
 
         if kind == "eval":
             out = expr
@@ -97,7 +93,6 @@ class MiniCalc(tk.Tk):
             out = fn(expr)
             self.set_steps("")
 
-        self.ans = out
         self.result.set(str(out))
 
 
